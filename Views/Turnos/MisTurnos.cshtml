@@ -1,0 +1,63 @@
+@model IEnumerable<SpaWebApp.Models.Turno>
+
+@{
+    ViewData["Title"] = "Mis Turnos";
+}
+
+<h2 class="text-center mt-4">Mis Turnos</h2>
+
+@if (ViewBag.PagoExitoso != null)
+{
+    <div class="alert alert-success text-center">
+        @ViewBag.PagoExitoso
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    foreach (var turno in Model)
+    {
+        // Obtiene el precio del servicio o establece 0 si no existe en ViewBag.Precios
+        var precio = (ViewBag.Precios != null && ViewBag.Precios.ContainsKey(turno.Servicio)) ? ViewBag.Precios[turno.Servicio] : 0;
+
+        <div class="card mb-4 p-3 shadow-sm @(turno.Estado == "Confirmado" ? "bg-light text-muted" : "")" style="opacity: @(turno.Estado == "Confirmado" ? "0.6" : "1");">
+            <h4 class="card-title">@turno.Servicio</h4>
+            <p><strong>Fecha:</strong> @(turno.FechaTurno.HasValue ? turno.FechaTurno.Value.ToString("dd/MM/yyyy HH:mm") : "Fecha no disponible")</p>
+            <p><strong>Precio:</strong> $@string.Format("{0:F2}", precio)</p>
+
+            @if (turno.Estado == "Pendiente")
+            {
+                <form asp-action="CompletarPago" method="post">
+                    <input type="hidden" name="turnoId" value="@turno.TurnoID" />
+
+                    <div class="form-group">
+                        <label for="metodoPago">Método de Pago</label>
+                        <select name="metodoPago" class="form-control" required>
+                            <option value="">Seleccione un método</option>
+                            <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                            <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success mt-3">Completar Pago</button>
+                </form>
+            }
+            else
+            {
+                <p><strong>Pago completado el:</strong> @(turno.FechaPago.HasValue ? turno.FechaPago.Value.ToString("dd/MM/yyyy") : "No disponible")</p>
+                <p><strong>Método de Pago:</strong> @(turno.MetodoPago ?? "No disponible")</p>
+            }
+        </div>
+    }
+}
+else
+{
+    <p class="text-center">No tienes turnos reservados actualmente.</p>
+}
+
+<style>
+    .bg-light.text-muted {
+        opacity: 0.6;
+        pointer-events: none; /* Desactiva interacciones en turnos confirmados */
+    }
+</style>

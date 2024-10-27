@@ -1,0 +1,191 @@
+@model IEnumerable<SpaWebApp.Models.Comentarios>
+
+@{
+    ViewData["Title"] = "Servicios";
+}
+
+<style>
+    .service-img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .service-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+        .service-list li {
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+            .service-list li::before {
+                content: "•";
+                color: #ff6f61;
+                font-size: 20px;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border: none;
+        border-radius: 10px;
+    }
+
+        .card:hover {
+            transform: scale(1.03);
+        }
+
+    .comment-section {
+        background-color: #ffffffd9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+    }
+
+    .comment-list .list-group-item {
+        margin-bottom: 10px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #ff6f61;
+        border-color: #ff6f61;
+    }
+
+        .btn-primary:hover {
+            background-color: #ff3b2f;
+            border-color: #ff3b2f;
+        }
+</style>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Nuestros Servicios</h1>
+
+    <div class="row mt-4">
+        <!-- Masajes -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <img src="~/images/masajes.jpg" class="card-img-top service-img" alt="Masajes" />
+                <div class="card-body">
+                    <h5 class="card-title">Masajes</h5>
+                    <ul class="service-list">
+                        <li>Anti-stress</li>
+                        <li>Descontracturantes</li>
+                        <li>Masajes con piedras calientes</li>
+                        <li>Circulatorios</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Belleza -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <img src="~/images/belleza.jpg" class="card-img-top service-img" alt="Belleza" />
+                <div class="card-body">
+                    <h5 class="card-title">Belleza</h5>
+                    <ul class="service-list">
+                        <li>Lifting de pestaña</li>
+                        <li>Depilación facial</li>
+                        <li>Belleza de manos y pies</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tratamientos Faciales -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <img src="~/images/tratamientos-faciales.jpg" class="card-img-top service-img" alt="Tratamientos Faciales" />
+                <div class="card-body">
+                    <h5 class="card-title">Tratamientos Faciales</h5>
+                    <ul class="service-list">
+                        <li>Punta de Diamante: Microexfoliación</li>
+                        <li>Limpieza profunda + Hidratación</li>
+                        <li>Crio frecuencia facial: efecto lifting instantáneo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tratamientos Corporales -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <img src="~/images/tratamientos-corporales.jpg" class="card-img-top service-img" alt="Tratamientos Corporales" />
+                <div class="card-body">
+                    <h5 class="card-title">Tratamientos Corporales</h5>
+                    <ul class="service-list">
+                        <li>VelaSlim: Reducción de la circunferencia corporal y la celulitis</li>
+                        <li>DermoHealth: drenaje linfático y estimulación de la microcirculación</li>
+                        <li>Criofrecuencia: efecto de lifting instantáneo</li>
+                        <li>Ultracavitación: Técnica reductora</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <h2 class="text-center mt-5">Comentarios de Clientes</h2>
+
+    <div class="comment-section mt-4">
+        @if (Model != null && Model.Any())
+        {
+            <ul class="list-group comment-list">
+                @foreach (var comentario in Model)
+                {
+                    <li class="list-group-item">
+                        <strong>@comentario.Nombre</strong> (@comentario.FechaComentario.ToString("dd/MM/yyyy")):
+                        <p>@comentario.Comentario</p>
+
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <form asp-controller="Comentarios" asp-action="Delete" method="post" style="display:inline;">
+                                <input type="hidden" name="comentarioId" value="@comentario.ComentarioID" />
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="alert alert-secondary text-center">
+                No hay comentarios aún. Sé el primero en dejar uno.
+            </div>
+        }
+    </div>
+
+    <hr />
+    <div class="mt-5">
+        <h3>Deja tu comentario</h3>
+        <form asp-controller="Comentarios" asp-action="Create" method="post">
+            <div class="form-group mb-3">
+                <label for="Nombre">Nombre</label>
+                <input type="text" id="Nombre" name="Nombre" class="form-control" required />
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="Comentario">Comentario</label>
+                <textarea id="Comentario" name="Comentario" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Enviar comentario</button>
+        </form>
+    </div>
+</div>

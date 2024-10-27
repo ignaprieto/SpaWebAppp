@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Noticias";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h1>Últimas Noticias</h1>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <!-- Primera Noticia -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="~/images/Noticia1.jpg" class="card-img-top" alt="Noticia 1" width="250" height="auto" />
+                <div class="card-body">
+                    <h5 class="card-title">El mejor spa del mundo está en Córdoba</h5>
+                    <p class="card-text">Este spa destaca por su diseño subterráneo inspirado en los baños romanos y su enfoque en ofrecer una experiencia única de bienestar y conexión personal​.</p>
+                    <a href="@Url.Action("Detalle", "Noticias", new { id = 1 })" class="btn btn-custom-green">Ver más</a>
+                </div>
+            </div>
+        </div>
+        <!-- Segunda Noticia -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="~/images/Noticia2.jpg" class="card-img-top" alt="Noticia 2" width="250" height="auto" />
+                <div class="card-body">
+                    <h5 class="card-title">Auge del turismo de bienestar en Argentina</h5>
+                    <p class="card-text">La tendencia del turismo de bienestar está en auge en el país, con cada vez más personas buscando experiencias relajantes en spas.</p>
+                    <a href="@Url.Action("Detalle", "Noticias", new { id = 2 })" class="btn btn-custom-green">Ver más</a>
+                </div>
+            </div>
+        </div>
+        <!-- Tercera Noticia -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="~/images/Noticia3.jpg" class="card-img-top" alt="Noticia 3" width="250" height="auto" />
+                <div class="card-body">
+                    <h5 class="card-title">Spas en Buenos Aires: una opción popular para el estrés urbano</h5>
+                    <p class="card-text">En Buenos Aires, los spas urbanos han ganado popularidad como un escape del ritmo acelerado de la ciudad. Lugares como Aqua Vita Spa y Serena Spa son conocidos por ofrecer tratamientos que ayudan a los porteños a relajarse y desconectarse sin salir de la capital​.</p>
+                    <a href="@Url.Action("Detalle", "Noticias", new { id = 3 })" class="btn btn-custom-green">Ver más</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

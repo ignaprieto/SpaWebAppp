@@ -1,0 +1,59 @@
+﻿@model SpaWebApp.Models.Turno
+
+@{
+    ViewData["Title"] = "Reservar Turno";
+}
+
+<div class="container mt-5 p-4 shadow rounded bg-white">
+    <h2 class="text-center mb-4">Reservar Turno</h2>
+
+    <form asp-action="Reservar" method="post">
+        <div class="form-group">
+            <label for="Servicio">Servicio</label>
+            <select id="servicio" name="Servicio" class="form-control" required onchange="obtenerPrecio()">
+                <option value="">Seleccione un servicio</option>
+                @foreach (var servicio in (IEnumerable<SelectListItem>)ViewBag.Servicios)
+                {
+                    <option value="@servicio.Value">@servicio.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="FechaTurno">Fecha del Turno</label>
+            <input type="date" id="fechaTurno" name="FechaTurno" class="form-control" required />
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="HorarioTurno">Horario del Turno</label>
+            <input type="time" id="horarioTurno" name="HorarioTurno" class="form-control" required />
+        </div>
+
+        <div class="form-group mt-3">
+            <label>Precio del Servicio: </label>
+            <span id="precioServicio" class="font-weight-bold">$0</span>
+        </div>
+
+        <div class="form-group mt-3">
+            <label for="Comentarios">Comentarios</label>
+            <textarea id="Comentarios" name="Comentarios" class="form-control" placeholder="Escribe algún comentario o instrucción específica..." rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-4">Reservar Turno</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function obtenerPrecio() {
+            const servicio = document.getElementById("servicio").value;
+            if (servicio) {
+                fetch(`/Turnos/ObtenerPrecioServicio?servicio=${servicio}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("precioServicio").innerText = `$${data}`;
+                    });
+            }
+        }
+    </script>
+}

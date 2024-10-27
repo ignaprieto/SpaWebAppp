@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Empleo";
+}
+
+<!-- Estilo CSS local -->
+<style>
+    .job-card {
+        margin-bottom: 30px;
+    }
+
+        .job-card h5 {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .job-card p {
+            margin-bottom: 5px;
+        }
+
+    .apply-btn {
+        margin-top: 10px;
+    }
+
+    .alert-success {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="text-center">
+        <h1>Trabaja con Nosotros</h1>
+        <p>Únete a nuestro equipo y forma parte de un ambiente de trabajo increíble</p>
+    </div>
+
+    <!-- Mostrar alerta si hay un mensaje de éxito -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="text-center mt-5">
+        <h3>Búsquedas actuales</h3>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Puesto 1 -->
+        <div class="col-md-6">
+            <div class="card job-card">
+                <div class="card-body">
+                    <h5 class="card-title">Recepcionista</h5>
+                    <p><strong>Requisitos:</strong></p>
+                    <ul>
+                        <li>Experiencia en atención al cliente</li>
+                        <li>Conocimiento básico de sistemas de gestión de turnos</li>
+                        <li>Buena presencia y actitud proactiva</li>
+                    </ul>
+                    <a href="@Url.Action("Aplicar", "Empleo")" class="btn btn-primary apply-btn">Aplicar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Puesto 2 -->
+        <div class="col-md-6">
+            <div class="card job-card">
+                <div class="card-body">
+                    <h5 class="card-title">Masajista Profesional</h5>
+                    <p><strong>Requisitos:</strong></p>
+                    <ul>
+                        <li>Título en masoterapia o equivalente</li>
+                        <li>Experiencia mínima de 2 años en masajes terapéuticos</li>
+                        <li>Capacidad para trabajar en equipo</li>
+                    </ul>
+                    <a href="@Url.Action("Aplicar", "Empleo")" class="btn btn-primary apply-btn">Aplicar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Puesto 3 -->
+        <div class="col-md-6">
+            <div class="card job-card">
+                <div class="card-body">
+                    <h5 class="card-title">Esteticista</h5>
+                    <p><strong>Requisitos:</strong></p>
+                    <ul>
+                        <li>Título en estética o cuidado de la piel</li>
+                        <li>Experiencia en tratamientos faciales y corporales</li>
+                        <li>Habilidades de comunicación y atención al cliente</li>
+                    </ul>
+                    <a href="@Url.Action("Aplicar", "Empleo")" class="btn btn-primary apply-btn">Aplicar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Puesto 4 -->
+        <div class="col-md-6">
+            <div class="card job-card">
+                <div class="card-body">
+                    <h5 class="card-title">Encargado de Limpieza</h5>
+                    <p><strong>Requisitos:</strong></p>
+                    <ul>
+                        <li>Experiencia en mantenimiento y limpieza de espacios</li>
+                        <li>Conocimientos básicos de productos de limpieza</li>
+                        <li>Responsabilidad y puntualidad</li>
+                    </ul>
+                    <a href="@Url.Action("Aplicar", "Empleo")" class="btn btn-primary apply-btn">Aplicar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

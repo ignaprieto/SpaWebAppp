@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sentirse Bien</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SpaWebApp.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #f7e9a0 0%, #f4b6c2 50%, #a8d5ba 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #a8d5ba, #6b8f71);
+        }
+
+        #sidebar-wrapper {
+            min-width: 250px;
+            background-color: #f7e9a0;
+            transition: all 0.5s;
+        }
+
+            #sidebar-wrapper.hidden {
+                margin-left: -250px;
+            }
+
+        #page-content-wrapper {
+            width: 100%;
+            transition: all 0.5s;
+            margin-bottom: 60px;
+            padding-bottom: 80px;
+        }
+
+        footer {
+            background-color: transparent;
+            color: #6c757d;
+            padding: 5px 0;
+            font-size: 10px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .footer-links {
+            text-align: center;
+            margin-top: 3px;
+        }
+
+        .register-message {
+            display: @(User.Identity.IsAuthenticated ? "none" : "block");
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            margin: 20px auto 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container-fluid justify-content-between">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button class="btn btn-outline-secondary" id="toggle-sidebar">Menu</button>
+                }
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="@(User.Identity.IsAuthenticated ? "Index" : "")">
+                    <img src="~/images/logo.jpg" alt="Logo" style="height: 60px; width: auto; margin-right: 15px;" />
+                    Sentirse Bien
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <div id="wrapper" class="d-flex @(User.Identity.IsAuthenticated ? "" : "hidden")">
+        <div id="sidebar-wrapper" class="bg-light border-right @(User.Identity.IsAuthenticated ? "" : "hidden")">
+            <div class="list-group list-group-flush">
+                <div class="list-group-item bg-light text-center">
+                    <strong>@User.Identity.Name</strong>
+                </div>
+                <a href="@Url.Action("Index", "Home")" class="list-group-item list-group-item-action bg-light">Inicio</a>
+                <a href="@Url.Action("Index", "Servicios")" class="list-group-item list-group-item-action bg-light">Servicios</a>
+
+                @if (User.IsInRole("Cliente"))
+                {
+                    <a href="@Url.Action("Reservar", "Turnos")" class="list-group-item list-group-item-action bg-light">Reservar Turno</a>
+                    <a href="@Url.Action("MisTurnos", "Turnos")" class="list-group-item list-group-item-action bg-light">Mis Turnos</a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Index", "Turnos")" class="list-group-item list-group-item-action bg-light">Turnos</a>
+                }
+
+                <a href="@Url.Action("Index", "Noticias")" class="list-group-item list-group-item-action bg-light">Noticias</a>
+                <a href="@Url.Action("Index", "Empleo")" class="list-group-item list-group-item-action bg-light">Empleo</a>
+
+                @if (User.IsInRole("Profesional") || User.IsInRole("Administrador"))
+                {
+                    <a href="@Url.Action("Clientes", "Home")" class="list-group-item list-group-item-action bg-light">Ver Clientes</a>
+                }
+
+                @* Enlace para el administrador a la gestión de precios de servicios *@
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a href="@Url.Action("Index", "PrecioServicios")" class="list-group-item list-group-item-action bg-light">Gestión de Precios de Servicios</a>
+                }
+
+                <a href="~/Auth/Logout" class="list-group-item list-group-item-action bg-light">Cerrar sesión</a>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <main role="main" class="container-fluid">
+                @RenderBody()
+                @if (!User.Identity.IsAuthenticated && ViewData["Title"].ToString() == "Login")
+                {
+                    <div class="register-message">
+                        <p>¿No tienes cuenta? <a href="@Url.Action("Register", "Auth")">Regístrate aquí</a>.</p>
+                    </div>
+                }
+            </main>
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container text-center footer-links" style="padding: 5px 0;">
+            &copy; 2024 - SpaWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a> |
+            <a asp-area="" asp-controller="Empleo" asp-action="Index">Empleo</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('#toggle-sidebar').click(function () {
+                $('#sidebar-wrapper').toggleClass('hidden');
+                $('#page-content-wrapper').toggleClass('full-width');
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

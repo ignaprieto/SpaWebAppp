@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SpaWebApp.Models.Turno>
+
+@{
+    ViewData["Title"] = "Historial de Turnos";
+}
+
+<h2>Historial de Turnos</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Servicio</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Comentarios</th>
+            <th>Cliente</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var turno in Model)
+        {
+            <tr>
+                <td>@turno.Servicio</td>
+                <td>@(turno.FechaTurno?.ToString("dd/MM/yyyy HH:mm") ?? "Fecha no disponible")</td>
+                <td>@turno.Estado</td>
+                <td>@turno.Comentarios</td>
+                <td>@turno.Usuario.Nombre @turno.Usuario.Apellido</td>
+            </tr>
+        }
+    </tbody>
+</table>

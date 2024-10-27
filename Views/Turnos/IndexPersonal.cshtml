@@ -1,0 +1,134 @@
+﻿@model IEnumerable<SpaWebApp.Models.Turno>
+
+@{
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<form id="updateStatusForm" asp-action="ActualizarEstado" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>TurnoID</th>
+                <th>UsuarioID</th>
+                <th>Nombre y Apellido</th>
+                <th>Servicio</th>
+                <th>Fecha del Turno</th>
+                <th>Estado</th>
+                <th>Comentarios</th>
+                @if (userRole == "Administrador")
+                {
+                    <th>Acciones</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var turno in Model)
+            {
+                <tr>
+                    <td>@turno.TurnoID</td>
+                    <td>@turno.UsuarioID</td>
+                    <td>@turno.Usuario.Nombre @turno.Usuario.Apellido</td>
+                    <td>@turno.Servicio</td>
+                    <td>@(turno.FechaTurno.HasValue ? turno.FechaTurno.Value.ToShortDateString() : "Fecha no especificada")</td>
+
+                    <td>
+                        @if (userRole == "Administrador")
+                        {
+                            <select name="Estados[@turno.TurnoID]" class="form-select">
+                                <option value="Pendiente" selected="@(turno.Estado == "Pendiente")">Pendiente</option>
+                                <option value="Confirmado" selected="@(turno.Estado == "Confirmado")">Confirmado</option>
+                                <option value="Cancelado" selected="@(turno.Estado == "Cancelado")">Cancelado</option>
+                            </select>
+                        }
+                        else
+                        {
+                            @turno.Estado
+                        }
+                    </td>
+                    <td>@turno.Comentarios</td>
+                    @if (userRole == "Administrador")
+                    {
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarTurno(@turno.TurnoID)">Eliminar</button>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (userRole == "Administrador")
+    {
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    }
+</form>
+
+<!-- Alert container -->
+<div id="alertContainer" class="fixed-top mt-5 mx-auto" style="width: 50%; display:none;">
+    <div class="alert alert-success" id="statusAlert" role="alert">
+        ¡Estado actualizado correctamente!
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Captura el evento de envío del formulario
+            $('#updateStatusForm').submit(function (e) {
+                e.preventDefault(); // Prevenir el envío normal del formulario
+
+                // Obtener el token de validación de anti-forgery
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                const data = $(this).serialize(); // Serializar el formulario
+
+                // Hacer la petición AJAX para actualizar el estado
+                $.ajax({
+                    url: '/Turnos/ActualizarEstado',
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    data: data,
+                    success: function (response) {
+                        if (response.success) {
+                            // Mostrar la alerta de éxito
+                            $('#alertContainer').fadeIn();
+
+                            // Ocultar la alerta después de 3 segundos
+                            setTimeout(function () {
+                                $('#alertContainer').fadeOut();
+                            }, 3000);
+                        }
+                    },
+                    error: function () {
+                        alert('Error al actualizar los estados.');
+                    }
+                });
+            });
+        });
+
+        // Función para eliminar un turno (sin cambios)
+        function eliminarTurno(turnoID) {
+            if (confirm('¿Estás seguro de que quieres eliminar este turno?')) {
+                const token = $('input[name="__RequestVerificationToken"]').val();
+                fetch(`/Turnos/EliminarTurno`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(turnoID)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Turno eliminado correctamente.');
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el turno: ' + data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+}

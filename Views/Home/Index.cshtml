@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<!-- Imagen de encabezado con texto superpuesto -->
+<div class="container-fluid p-0">
+    <div class="header-image" style="position: relative; text-align: center;">
+        <img src="~/images/spa-header.jpg" alt="Spa" style="width: 100%; height: auto; max-height: 400px; object-fit: cover;" />
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;">
+            <h1 style="font-size: 3rem; margin: 0;">Sentirse Bien</h1>
+            <h2 style="font-size: 2rem; margin: 0;">Spa</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Sección "Quiénes somos" -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="~/images/logo.jpg" alt="Quiénes somos" class="img-fluid" />
+        </div>
+        <div class="col-md-8">
+            <h1>Quiénes somos</h1>
+            <p class="lead mt-3">
+                Bienvenidos a Sentirse Bien, tu oasis de relajación y bienestar.
+                Nuestro spa fue fundado con un propósito claro: ofrecer un espacio donde las personas puedan desconectar del estrés diario
+                y reconectar con su bienestar físico y emocional. En Sentirse Bien, creemos que cada persona merece un cuidado especial y personalizado,
+                y nos dedicamos a brindarte tratamientos que no solo embellecen tu cuerpo, sino que también revitalizan tu mente y alma.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Sección "Servicios" -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h2>Nuestros Servicios</h2>
+        </div>
+
+        <!-- Masajes -->
+        <div class="col-md-4 text-center mt-4">
+            <a href="/Servicios" style="text-decoration: none; color: inherit;">
+                <img src="~/images/masajes.jpg" alt="Masajes" class="img-fluid" />
+                <h4 class="mt-2">Masajes</h4>
+            </a>
+        </div>
+
+        <!-- Belleza -->
+        <div class="col-md-4 text-center mt-4">
+            <a href="/Servicios" style="text-decoration: none; color: inherit;">
+                <img src="~/images/belleza.jpg" alt="Belleza" class="img-fluid" />
+                <h4 class="mt-2">Belleza</h4>
+            </a>
+        </div>
+
+        <!-- Tratamientos Faciales -->
+        <div class="col-md-4 text-center mt-4">
+            <a href="/Servicios" style="text-decoration: none; color: inherit;">
+                <img src="~/images/tratamientos-faciales.jpg" alt="Tratamientos Faciales" class="img-fluid" />
+                <h4 class="mt-2">Tratamientos Faciales</h4>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<!-- Sección "Encuéntranos en el Mapa" -->
+<div id="map-section" class="container mt-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
+            <div>
+                <h2>Encuéntranos en</h2>
+                <p style="font-size: 1.5rem;">
+                    <i class="fas fa-map-marker-alt" style="color: black;"></i> French 414
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.582777176068!2d-58.98158552283113!3d-27.45111061591758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450cf0c80be0d3%3A0xc9f9278c74810912!2sUTN%20-%20Facultad%20Regional%20Resistencia!5e0!3m2!1ses-419!2sar!4v1726407086968!5m2!1ses-419!2sar"
+                    width="100%"
+                    height="450" <!-- Ajustar altura aquí -->
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+<!-- Formulario de Contacto -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <h2>Contáctanos</h2>
+        </div>
+        <div class="col-md-8 offset-md-2">
+            <form asp-action="Contact" method="post">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control" id="email" name="email" required />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="mensaje">Mensaje:</label>
+                    <textarea class="form-control" id="mensaje" name="mensaje" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Enviar</button>
+            </form>
+            @if (ViewBag.Message != null)
+            {
+                <div class="alert alert-success mt-3">@ViewBag.Message</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- No es necesario para mapas estáticos -->
+}
+

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SpaWebApp.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Lista de Clientes";
+}
+
+<h2>Lista de Clientes</h2>
+
+<h5>Ordenado Alfabéticamente</h5>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cliente in Model)
+        {
+            <tr>
+                <td>@cliente.Nombre</td>
+                <td>@cliente.Apellido</td>
+                <td>@cliente.Email</td>
+                <td>@cliente.Telefono</td> <!-- Asegúrate de que el modelo Usuario tenga este campo -->
+            </tr>
+        }
+    </tbody>
+</table>
