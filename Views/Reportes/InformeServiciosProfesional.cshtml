@@ -1,0 +1,31 @@
+﻿<h1>Informe de Servicios por Profesional</h1>
+<p><strong>Fecha de Inicio:</strong> @ViewBag.FechaInicio</p>
+<p><strong>Fecha de Fin:</strong> @ViewBag.FechaFin</p>
+
+<table class="table">
+    <tr>
+        <th>Servicio</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Precio</th>
+    </tr>
+    @if (ViewBag.Servicios != null)
+    {
+        foreach (var servicio in ViewBag.Servicios)
+        {
+            <tr>
+                <td>@servicio.Servicio</td>
+                <td>@servicio.FechaTurno.ToString("dd/MM/yyyy")</td>
+                <td>@servicio.Cliente</td>
+                <td>@servicio.Precio</td>
+            </tr>
+        }
+    }
+</table>
+
+<form asp-action="GenerarPDFServiciosProfesional" method="post">
+    <input type="hidden" name="fechaInicio" value="@ViewBag.FechaInicio" />
+    <input type="hidden" name="fechaFin" value="@ViewBag.FechaFin" />
+    <input type="hidden" name="profesionalId" value="@ViewBag.ProfesionalId" />
+    <button type="submit" class="btn btn-primary">Descargar PDF</button>
+</form>

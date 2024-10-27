@@ -21,12 +21,29 @@
 
         #sidebar-wrapper {
             min-width: 250px;
-            background-color: #f7e9a0;
+            background-color: #f0f4f8;
+            border-right: 1px solid #ddd;
+            padding: 15px;
             transition: all 0.5s;
         }
 
             #sidebar-wrapper.hidden {
                 margin-left: -250px;
+            }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: 500;
+            border-radius: 4px;
+            padding: 8px;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+            .sidebar .nav-link:hover {
+                background-color: #d0e1f9;
+                color: #0056b3;
             }
 
         #page-content-wrapper {
@@ -86,39 +103,47 @@
     </header>
 
     <div id="wrapper" class="d-flex @(User.Identity.IsAuthenticated ? "" : "hidden")">
-        <div id="sidebar-wrapper" class="bg-light border-right @(User.Identity.IsAuthenticated ? "" : "hidden")">
+        <div id="sidebar-wrapper" class="bg-light border-right sidebar @(User.Identity.IsAuthenticated ? "" : "hidden")">
             <div class="list-group list-group-flush">
                 <div class="list-group-item bg-light text-center">
                     <strong>@User.Identity.Name</strong>
                 </div>
-                <a href="@Url.Action("Index", "Home")" class="list-group-item list-group-item-action bg-light">Inicio</a>
-                <a href="@Url.Action("Index", "Servicios")" class="list-group-item list-group-item-action bg-light">Servicios</a>
+                <a href="@Url.Action("Index", "Home")" class="nav-link">Inicio</a>
+                <a href="@Url.Action("Index", "Servicios")" class="nav-link">Servicios</a>
 
                 @if (User.IsInRole("Cliente"))
                 {
-                    <a href="@Url.Action("Reservar", "Turnos")" class="list-group-item list-group-item-action bg-light">Reservar Turno</a>
-                    <a href="@Url.Action("MisTurnos", "Turnos")" class="list-group-item list-group-item-action bg-light">Mis Turnos</a>
+                    <a href="@Url.Action("Reservar", "Turnos")" class="nav-link">Reservar Turno</a>
+                    <a href="@Url.Action("MisTurnos", "Turnos")" class="nav-link">Mis Turnos</a>
                 }
                 else
                 {
-                    <a href="@Url.Action("Index", "Turnos")" class="list-group-item list-group-item-action bg-light">Turnos</a>
+                    <a href="@Url.Action("Index", "Turnos")" class="nav-link">Turnos</a>
                 }
 
-                <a href="@Url.Action("Index", "Noticias")" class="list-group-item list-group-item-action bg-light">Noticias</a>
-                <a href="@Url.Action("Index", "Empleo")" class="list-group-item list-group-item-action bg-light">Empleo</a>
+                <a href="@Url.Action("Index", "Noticias")" class="nav-link">Noticias</a>
+                <a href="@Url.Action("Index", "Empleo")" class="nav-link">Empleo</a>
 
                 @if (User.IsInRole("Profesional") || User.IsInRole("Administrador"))
                 {
-                    <a href="@Url.Action("Clientes", "Home")" class="list-group-item list-group-item-action bg-light">Ver Clientes</a>
+                    <a href="@Url.Action("Clientes", "Home")" class="nav-link">Ver Clientes</a>
                 }
 
-                @* Enlace para el administrador a la gestión de precios de servicios *@
                 @if (User.IsInRole("Administrador"))
                 {
-                    <a href="@Url.Action("Index", "PrecioServicios")" class="list-group-item list-group-item-action bg-light">Gestión de Precios de Servicios</a>
+                    <a href="@Url.Action("Index", "PrecioServicios")" class="nav-link">Gestión de Precios de Servicios</a>
+                    <a href="@Url.Action("InformeIngresos", "Reportes")" class="nav-link">Informe de Ingresos</a>
                 }
 
-                <a href="~/Auth/Logout" class="list-group-item list-group-item-action bg-light">Cerrar sesión</a>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Reportes" asp-action="InformeServiciosProfesional">Informe de Servicios Profesional</a>
+                    </li>
+                }
+
+
+                <a href="~/Auth/Logout" class="nav-link">Cerrar sesión</a>
             </div>
         </div>
 

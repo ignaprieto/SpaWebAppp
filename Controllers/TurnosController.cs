@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
+using SpaWebApp.Services;
 
 namespace SpaWebApp.Controllers
 {
@@ -15,10 +16,12 @@ namespace SpaWebApp.Controllers
     public class TurnosController : Controller
     {
         private readonly SpaContext _context;
+        private readonly EmailService _emailService;
 
-        public TurnosController(SpaContext context)
+        public TurnosController(SpaContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         private List<SelectListItem> GetServicioList()
@@ -127,22 +130,35 @@ namespace SpaWebApp.Controllers
                     turno.Comentarios = Comentarios;
 
                     if (turno.FechaTurno.HasValue && DateTime.TryParse(turno.FechaTurno.Value.ToString("yyyy-MM-dd") + " " + HorarioTurno, out DateTime fechaCompleta))
-
                     {
-                        turno.FechaTurno = fechaCompleta;
+                        // Validación de fecha y horario
+                        if (fechaCompleta.Date < DateTime.Now.Date)
+                        {
+                            ModelState.AddModelError("FechaTurno", "La fecha del turno debe ser posterior a la fecha actual.");
+                        }
+                        else if (fechaCompleta.TimeOfDay < TimeSpan.FromHours(8) || fechaCompleta.TimeOfDay > TimeSpan.FromHours(20))
+                        {
+                            ModelState.AddModelError("HorarioTurno", "El horario del turno debe estar entre las 8:00 y las 20:00.");
+                        }
+                        else
+                        {
+                            turno.FechaTurno = fechaCompleta;
+                        }
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Error al procesar la fecha y hora del turno.");
-                        ViewBag.Servicios = GetServicioList();
-                        return View(turno);
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "No se encontró el usuario.");
+                }
+
+                if (!ModelState.IsValid)
+                {
                     ViewBag.Servicios = GetServicioList();
-                    return View(turno);
+                    return View(turno); // Mostrar los errores en la vista
                 }
 
                 _context.Turnos.Add(turno);
@@ -154,6 +170,7 @@ namespace SpaWebApp.Controllers
             ViewBag.Servicios = GetServicioList();
             return View(turno);
         }
+
 
         // GET: Turnos/MisTurnos
         public IActionResult MisTurnos()
@@ -173,14 +190,18 @@ namespace SpaWebApp.Controllers
                     TurnoID = t.TurnoID,
                     UsuarioID = t.UsuarioID,
                     Servicio = t.Servicio ?? "Servicio no especificado",
-                    FechaTurno = t.FechaTurno ?? (DateTime?)null, // Asegurarse de asignar null si no hay valor
+                    FechaTurno = t.FechaTurno ?? (DateTime?)null,
                     Estado = t.Estado ?? "Estado no especificado",
                     Comentarios = t.Comentarios ?? "Sin comentarios",
                     MetodoPago = t.MetodoPago ?? "No disponible",
-                    FechaPago = t.FechaPago ?? (DateTime?)null, // Asegurarse de asignar null si no hay valor
+                    FechaPago = t.FechaPago ?? (DateTime?)null,
                     Usuario = t.Usuario
                 })
                 .ToList();
+
+            // Cargar precios de los servicios en ViewBag
+            var precios = _context.PreciosServicios.ToDictionary(p => p.Servicio, p => p.Precio);
+            ViewBag.Precios = precios;
 
             ViewBag.PagoExitoso = TempData["PagoExitoso"];
             return View(turnos);
@@ -254,5 +275,60 @@ namespace SpaWebApp.Controllers
                 return Json(new { success = false, message = "Ocurrió un error al eliminar el turno." });
             }
         }
+
+        //GUARDAR DATOS DE TARJETA
+        [HttpPost]
+        public async Task<IActionResult> ProcesarPago(int turnoId, string numeroTarjeta, string codigoTarjeta, DateTime fechaExpiracionTarjeta, string metodoPago)
+        {
+            // Cargar el turno junto con el usuario
+            var turno = _context.Turnos
+                .Include(t => t.Usuario)
+                .SingleOrDefault(t => t.TurnoID == turnoId);
+
+            if (turno == null)
+            {
+                return NotFound();
+            }
+
+            // Guardar los datos de la tarjeta en el turno y confirmar el turno
+            turno.NumeroTarjeta = numeroTarjeta;
+            turno.CodigoTarjeta = codigoTarjeta;
+            turno.FechaExpiracionTarjeta = fechaExpiracionTarjeta;
+            turno.FechaPago = DateTime.Now;
+            turno.Estado = "Confirmado";
+            turno.MetodoPago = metodoPago;
+
+            _context.SaveChanges();
+
+            // Generar y enviar la factura por correo
+            var usuarioEmail = turno.Usuario.Email;
+            var cuerpoHtml = GenerarFacturaHtml(turno);
+            await _emailService.EnviarFactura(usuarioEmail, "Factura de Pago - Spa", cuerpoHtml);
+
+            return RedirectToAction("MisTurnos");
+        }
+
+        // MÉTODO PARA GENERAR FACTURA
+
+        private string GenerarFacturaHtml(Turno turno)
+        {
+            // Obtener el precio del servicio desde la base de datos
+            var precioServicio = _context.PreciosServicios
+                .Where(p => p.Servicio == turno.Servicio)
+                .Select(p => p.Precio)
+                .FirstOrDefault();
+
+            return $@"
+        <h2>Factura de Pago</h2>
+        <p><strong>Servicio:</strong> {turno.Servicio}</p>
+        <p><strong>Fecha del Turno:</strong> {turno.FechaTurno?.ToString("dd/MM/yyyy HH:mm")}</p>
+        <p><strong>Método de Pago:</strong> {turno.MetodoPago}</p>
+        <p><strong>Precio:</strong> ${precioServicio}</p>
+        <p>Gracias por elegir nuestro spa. ¡Esperamos verlo pronto!</p>";
+        }
+
+
+
     }
+
 }

@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Informe de Ingresos";
+}
+
+<h2>Informe de Ingresos</h2>
+
+<form asp-action="InformeIngresos" method="post">
+    <div>
+        <label for="fechaInicio">Fecha Inicio:</label>
+        <input type="date" id="fechaInicio" name="fechaInicio" required />
+    </div>
+    <div>
+        <label for="fechaFin">Fecha Fin:</label>
+        <input type="date" id="fechaFin" name="fechaFin" required />
+    </div>
+    <button type="submit">Generar Informe</button>
+</form>
+
+@if (ViewBag.Ingresos != null)
+{
+    <h3>Resultados</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Método de Pago</th>
+                <th>Total Ingresos</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ingreso in ViewBag.Ingresos)
+            {
+                <tr>
+                    <td>@ingreso.MetodoPago</td>
+                    <td>@ingreso.TotalIngresos</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

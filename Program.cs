@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using SpaWebApp.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using SpaWebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +25,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Auth/Login"; // Redirigir a Login si el acceso es denegado
     });
 
+// Agregar EmailService antes de construir la aplicación
+builder.Services.AddTransient<EmailService>();
+
 var app = builder.Build();
 
-// Configurar el middleware
+// Configuración de middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

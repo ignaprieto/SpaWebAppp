@@ -21,12 +21,12 @@
 
         <div class="form-group mt-3">
             <label for="FechaTurno">Fecha del Turno</label>
-            <input type="date" id="fechaTurno" name="FechaTurno" class="form-control" required />
+            <input type="date" id="fechaTurno" name="FechaTurno" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" required />
         </div>
 
         <div class="form-group mt-3">
             <label for="HorarioTurno">Horario del Turno</label>
-            <input type="time" id="horarioTurno" name="HorarioTurno" class="form-control" required />
+            <input type="time" id="horarioTurno" name="HorarioTurno" class="form-control" min="08:00" max="20:00" required />
         </div>
 
         <div class="form-group mt-3">

@@ -25,5 +25,10 @@ namespace SpaWebApp.Models
         public DateTime? FechaPago { get; set; }
 
         public string NombreCompletoCliente => Usuario != null ? $"{Usuario.Nombre} {Usuario.Apellido}" : "N/A";
+
+        public string? NumeroTarjeta { get; set; }
+        public string? CodigoTarjeta { get; set; }
+        public DateTime? FechaExpiracionTarjeta { get; set; }
+
     }
 }

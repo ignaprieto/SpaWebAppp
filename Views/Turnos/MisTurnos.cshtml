@@ -27,7 +27,7 @@
 
             @if (turno.Estado == "Pendiente")
             {
-                <form asp-action="CompletarPago" method="post">
+                <form asp-action="ProcesarPago" method="post">
                     <input type="hidden" name="turnoId" value="@turno.TurnoID" />
 
                     <div class="form-group">
@@ -37,6 +37,20 @@
                             <option value="Tarjeta de Débito">Tarjeta de Débito</option>
                             <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
                         </select>
+                    </div>
+
+                    <!-- Campos de tarjeta -->
+                    <div class="form-group mt-3">
+                        <label for="numeroTarjeta">Número de Tarjeta</label>
+                        <input type="text" id="numeroTarjeta" name="NumeroTarjeta" maxlength="16" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="codigoTarjeta">Código de Seguridad</label>
+                        <input type="text" id="codigoTarjeta" name="CodigoTarjeta" maxlength="4" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaExpiracionTarjeta">Fecha de Expiración</label>
+                        <input type="month" id="fechaExpiracionTarjeta" name="FechaExpiracionTarjeta" class="form-control" required />
                     </div>
 
                     <button type="submit" class="btn btn-success mt-3">Completar Pago</button>
