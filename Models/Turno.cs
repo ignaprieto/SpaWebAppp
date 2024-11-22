@@ -23,7 +23,7 @@ namespace SpaWebApp.Models
 
         public string? MetodoPago { get; set; } // Modificado para permitir nulo
         public DateTime? FechaPago { get; set; }
-
+        public string? CodDescuento { get; set; } // Nuevo campo para código de descuento
         public string NombreCompletoCliente => Usuario != null ? $"{Usuario.Nombre} {Usuario.Apellido}" : "N/A";
 
         public string? NumeroTarjeta { get; set; }

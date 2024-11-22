@@ -24,8 +24,8 @@ namespace SpaWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Consultas.Add(consulta);
-                _context.SaveChanges();
+                //_context.Consultas.Add(consulta);
+                //_context.SaveChanges();
                 ViewBag.Message = "Consulta enviada correctamente.";
             }
 

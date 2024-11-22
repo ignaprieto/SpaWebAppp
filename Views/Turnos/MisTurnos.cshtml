@@ -53,6 +53,12 @@
                         <input type="month" id="fechaExpiracionTarjeta" name="FechaExpiracionTarjeta" class="form-control" required />
                     </div>
 
+                    <!-- Campo para código de descuento -->
+                    <div class="form-group">
+                        <label for="codDescuento">Código de Descuento</label>
+                        <input type="text" id="codDescuento" name="CodDescuento" maxlength="15" class="form-control" placeholder="Ej: Descuento10" />
+                    </div>
+
                     <button type="submit" class="btn btn-success mt-3">Completar Pago</button>
                 </form>
             }
@@ -60,6 +66,7 @@
             {
                 <p><strong>Pago completado el:</strong> @(turno.FechaPago.HasValue ? turno.FechaPago.Value.ToString("dd/MM/yyyy") : "No disponible")</p>
                 <p><strong>Método de Pago:</strong> @(turno.MetodoPago ?? "No disponible")</p>
+                <p><strong>Código de Descuento:</strong> @(string.IsNullOrEmpty(turno.CodDescuento) ? "No utilizado" : turno.CodDescuento)</p>
             }
         </div>
     }

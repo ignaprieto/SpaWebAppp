@@ -195,6 +195,7 @@ namespace SpaWebApp.Controllers
                     Comentarios = t.Comentarios ?? "Sin comentarios",
                     MetodoPago = t.MetodoPago ?? "No disponible",
                     FechaPago = t.FechaPago ?? (DateTime?)null,
+                    CodDescuento = t.CodDescuento ?? "No utilizado",
                     Usuario = t.Usuario
                 })
                 .ToList();
@@ -277,8 +278,45 @@ namespace SpaWebApp.Controllers
         }
 
         //GUARDAR DATOS DE TARJETA
+        /* [HttpPost]
+         public async Task<IActionResult> ProcesarPago(int turnoId, string numeroTarjeta, string codigoTarjeta, DateTime fechaExpiracionTarjeta, string metodoPago)
+         {
+             // Cargar el turno junto con el usuario
+             var turno = _context.Turnos
+                 .Include(t => t.Usuario)
+                 .SingleOrDefault(t => t.TurnoID == turnoId);
+
+             if (turno == null)
+             {
+                 return NotFound();
+             }
+
+             // Guardar los datos de la tarjeta en el turno y confirmar el turno
+             turno.NumeroTarjeta = numeroTarjeta;
+             turno.CodigoTarjeta = codigoTarjeta;
+             turno.FechaExpiracionTarjeta = fechaExpiracionTarjeta;
+             turno.FechaPago = DateTime.Now;
+             turno.Estado = "Confirmado";
+             turno.MetodoPago = metodoPago;
+
+             _context.SaveChanges();
+
+             // Generar y enviar la factura por correo
+             var usuarioEmail = turno.Usuario.Email;
+             var cuerpoHtml = GenerarFacturaHtml(turno);
+             await _emailService.EnviarFactura(usuarioEmail, "Factura de Pago - Spa", cuerpoHtml);
+
+             return RedirectToAction("MisTurnos");
+         }*/
+
         [HttpPost]
-        public async Task<IActionResult> ProcesarPago(int turnoId, string numeroTarjeta, string codigoTarjeta, DateTime fechaExpiracionTarjeta, string metodoPago)
+        public async Task<IActionResult> ProcesarPago(
+    int turnoId,
+    string numeroTarjeta,
+    string codigoTarjeta,
+    DateTime fechaExpiracionTarjeta,
+    string metodoPago,
+    string codDescuento)
         {
             // Cargar el turno junto con el usuario
             var turno = _context.Turnos
@@ -290,27 +328,66 @@ namespace SpaWebApp.Controllers
                 return NotFound();
             }
 
-            // Guardar los datos de la tarjeta en el turno y confirmar el turno
+            // Verificar si el código de descuento es válido
+            decimal descuento = 0;
+            if (!string.IsNullOrEmpty(codDescuento))
+            {
+                switch (codDescuento)
+                {
+                    case "Descuento10":
+                        descuento = 0.10m;
+                        break;
+                    case "Descuento20":
+                        descuento = 0.20m;
+                        break;
+                    case "Descuento30":
+                        descuento = 0.30m;
+                        break;
+                    default:
+                        TempData["Error"] = "Código de descuento no válido.";
+                        return RedirectToAction("MisTurnos");
+                }
+            }
+
+            // Obtener el precio del servicio
+            var precioServicio = _context.PreciosServicios
+                .Where(p => p.Servicio == turno.Servicio)
+                .Select(p => p.Precio)
+                .FirstOrDefault();
+
+            if (precioServicio == null)
+            {
+                TempData["Error"] = "Error al obtener el precio del servicio.";
+                return RedirectToAction("MisTurnos");
+            }
+
+            // Calcular el precio con descuento
+            var precioConDescuento = descuento > 0 ? precioServicio.Value * (1 - descuento) : precioServicio.Value;
+
+            // Guardar los datos de la tarjeta, el código de descuento y confirmar el turno
             turno.NumeroTarjeta = numeroTarjeta;
             turno.CodigoTarjeta = codigoTarjeta;
             turno.FechaExpiracionTarjeta = fechaExpiracionTarjeta;
             turno.FechaPago = DateTime.Now;
             turno.Estado = "Confirmado";
             turno.MetodoPago = metodoPago;
+            turno.CodDescuento = codDescuento;
 
             _context.SaveChanges();
 
             // Generar y enviar la factura por correo
             var usuarioEmail = turno.Usuario.Email;
-            var cuerpoHtml = GenerarFacturaHtml(turno);
+            var cuerpoHtml = GenerarFacturaHtml(turno, precioServicio.Value, precioConDescuento, descuento);
             await _emailService.EnviarFactura(usuarioEmail, "Factura de Pago - Spa", cuerpoHtml);
 
+            TempData["PagoExitoso"] = "Pago exitosamente completado.";
             return RedirectToAction("MisTurnos");
         }
 
+
         // MÉTODO PARA GENERAR FACTURA
 
-        private string GenerarFacturaHtml(Turno turno)
+        private string GenerarFacturaHtml(Turno turno, decimal precioOriginal, decimal precioConDescuento, decimal descuento)
         {
             // Obtener el precio del servicio desde la base de datos
             var precioServicio = _context.PreciosServicios
@@ -323,7 +400,9 @@ namespace SpaWebApp.Controllers
         <p><strong>Servicio:</strong> {turno.Servicio}</p>
         <p><strong>Fecha del Turno:</strong> {turno.FechaTurno?.ToString("dd/MM/yyyy HH:mm")}</p>
         <p><strong>Método de Pago:</strong> {turno.MetodoPago}</p>
-        <p><strong>Precio:</strong> ${precioServicio}</p>
+        <p><strong>Precio Original:</strong> ${precioOriginal:F2}</p>
+        <p><strong>Descuento Aplicado:</strong> {descuento * 100}%</p>
+        <p><strong>Precio Final:</strong> ${precioConDescuento:F2}</p>
         <p>Gracias por elegir nuestro spa. ¡Esperamos verlo pronto!</p>";
         }
 
