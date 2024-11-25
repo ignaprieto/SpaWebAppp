@@ -17,7 +17,6 @@
 {
     foreach (var turno in Model)
     {
-        // Obtiene el precio del servicio o establece 0 si no existe en ViewBag.Precios
         var precio = (ViewBag.Precios != null && ViewBag.Precios.ContainsKey(turno.Servicio)) ? ViewBag.Precios[turno.Servicio] : 0;
 
         <div class="card mb-4 p-3 shadow-sm @(turno.Estado == "Confirmado" ? "bg-light text-muted" : "")" style="opacity: @(turno.Estado == "Confirmado" ? "0.6" : "1");">
@@ -27,8 +26,10 @@
 
             @if (turno.Estado == "Pendiente")
             {
-                <form asp-action="ProcesarPago" method="post">
+                <!-- Formulario de pago -->
+                <form asp-action="ProcesarPago" method="post" id="form-pago">
                     <input type="hidden" name="turnoId" value="@turno.TurnoID" />
+                    <input type="hidden" name="CodDescuento" id="hidden-cod-descuento-@turno.TurnoID" />
 
                     <div class="form-group">
                         <label for="metodoPago">Método de Pago</label>
@@ -53,20 +54,23 @@
                         <input type="month" id="fechaExpiracionTarjeta" name="FechaExpiracionTarjeta" class="form-control" required />
                     </div>
 
-                    <!-- Campo para código de descuento -->
-                    <div class="form-group">
-                        <label for="codDescuento">Código de Descuento</label>
-                        <input type="text" id="codDescuento" name="CodDescuento" maxlength="15" class="form-control" placeholder="Ej: Descuento10" />
+                    <!-- Código de Descuento -->
+                    <div class="form-group mt-3">
+                        <label for="codDescuento">Código de Descuento (Opcional)</label>
+                        <input type="text" id="codDescuento-@turno.TurnoID" class="form-control" placeholder="Ej: Descuento10" />
+                        <span id="alerta-descuento-@turno.TurnoID" style="display:none; color:red; font-size:0.9em;"></span>
+                        <button type="button" class="btn btn-info mt-2" onclick="validarCodigo(@turno.TurnoID, @precio)">Validar Código</button>
                     </div>
 
                     <button type="submit" class="btn btn-success mt-3">Completar Pago</button>
                 </form>
+
             }
             else
             {
                 <p><strong>Pago completado el:</strong> @(turno.FechaPago.HasValue ? turno.FechaPago.Value.ToString("dd/MM/yyyy") : "No disponible")</p>
                 <p><strong>Método de Pago:</strong> @(turno.MetodoPago ?? "No disponible")</p>
-                <p><strong>Código de Descuento:</strong> @(string.IsNullOrEmpty(turno.CodDescuento) ? "No utilizado" : turno.CodDescuento)</p>
+                <p><strong>Código de Descuento:</strong> @(turno.CodDescuento ?? "No utilizado")</p>
             }
         </div>
     }
@@ -76,9 +80,92 @@ else
     <p class="text-center">No tienes turnos reservados actualmente.</p>
 }
 
+<!-- Modal para mostrar mensajes -->
+<div class="modal fade" id="modal-alerta" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Validación de Código</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido del mensaje -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validarCodigo(turnoId, precioOriginal) {
+        const codigoInput = document.getElementById(`codDescuento-${turnoId}`);
+        const alertaDescuento = document.getElementById(`alerta-descuento-${turnoId}`);
+        const codigo = codigoInput.value.trim();
+
+        // Reiniciar el mensaje de alerta
+        alertaDescuento.textContent = "";
+        alertaDescuento.style.display = "none";
+
+        if (!codigo) {
+            alertaDescuento.textContent = "Por favor, ingrese un código de descuento.";
+            alertaDescuento.style.display = "block";
+            return;
+        }
+
+        let descuento = 0;
+
+        switch (codigo) {
+            case "Descuento10":
+                descuento = 0.1;
+                break;
+            case "Descuento20":
+                descuento = 0.2;
+                break;
+            case "Descuento30":
+                descuento = 0.3;
+                break;
+            default:
+                alertaDescuento.textContent = "Código de descuento inválido.";
+                alertaDescuento.style.display = "block";
+                return;
+        }
+
+        const precioConDescuento = precioOriginal * (1 - descuento);
+        alertaDescuento.textContent = `Código de descuento aplicado (${descuento * 100}%). Precio total con descuento: $${precioConDescuento.toFixed(2)}.`;
+        alertaDescuento.style.color = "green"; // Mostrar en verde si es válido
+        alertaDescuento.style.display = "block";
+
+        // Establecer el código de descuento para el formulario de pago
+        document.getElementById(`hidden-cod-descuento-${turnoId}`).value = codigo;
+    }
+</script>
+
+
+
 <style>
-    .bg-light.text-muted {
-        opacity: 0.6;
-        pointer-events: none; /* Desactiva interacciones en turnos confirmados */
+    @@media screen and (max-width: 768px) {
+        .card-title {
+            font-size: 18px;
+        }
+        .form-group label {
+            font-size: 14px;
+        }
+        .form-control {
+            font-size: 14px;
+        }
+    }
+
+    @@media screen and (max-width: 576px) {
+        .card-title {
+            font-size: 16px;
+        }
+        .form-group label {
+            font-size: 12px;
+        }
+        .form-control {
+            font-size: 12px;
+        }
     }
 </style>
